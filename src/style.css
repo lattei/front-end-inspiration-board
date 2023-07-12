@@ -1,0 +1,321 @@
+/* App.css */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #292524;
+  color: #fafaf9;
+  font-family: "Montserrat Alternates", sans-serif;
+  padding: 48px 64px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.container {
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.main {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 48px;
+}
+
+@media (max-width: 900px) {
+  .main {
+    grid-template-columns: 1fr;
+  }
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo img {
+  width: 68px;
+  height: 68px;
+}
+
+h1 {
+  font-size: 42px;
+  text-transform: uppercase;
+  font-family: "Tillana", sans-serif;
+  line-height: 1;
+  margin-top: 6px;
+}
+
+.board {
+  margin-bottom: 16px;
+}
+
+.card {
+  font-size: 20px;
+  line-height: 1.4;
+  background-color: #44403c;
+  margin-bottom: 16px;
+  padding: 16px 24px;
+  letter-spacing: -1px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+@media (max-width: 1200px) {
+  .card {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+  }
+}
+
+.tag {
+  text-transform: uppercase;
+  font-size: 14px;
+  font-family: "Montserrat Alternates", sans-serif;
+  padding-top: 3px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 100px;
+}
+
+.vote-buttons {
+  margin-left: auto;
+  flex-shrink: 0;
+  display: flex;
+  gap: 8px;
+}
+
+.vote-buttons button {
+  background-color: #78716c;
+  border: none;
+  font-size: 18px;
+  padding: 6px 12px;
+  border-radius: 100px;
+  color: inherit;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.vote-buttons button:hover {
+  background-color: #292524;
+  transform: translateY(0.25em);
+  transition: all 0.25s ease-out;
+  cursor: pointer;
+}
+
+ul {
+  list-style: none;
+}
+
+.source:link,
+.source:visited {
+  color: #a8a29e;
+  text-decoration: none;
+  margin-left: 12px;
+  transition: 0.025s;
+}
+
+.source:hover,
+.source:active {
+  color: #3b82f6;
+}
+
+.btn {
+  border: none;
+  font-family: "Montserrat Alternates", sans-serif;
+  line-height: 1;
+  text-transform: uppercase;
+  font-size: 17px;
+  padding: 16px 0 13px;
+  background-image: linear-gradient(135deg, #f80f0b, rgb(255, 0, 208), #8c07c9);
+  color: inherit;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-large {
+  font-size: 20px;
+  padding: 20px 32px 17px;
+}
+
+.btn-all-boards {
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.btn-board {
+  width: 100%;
+  background-image: none;
+}
+
+.btn-category {
+  width: 100%;
+  background-image: none;
+}
+
+.btn:hover {
+  border-color: #fdfcfd;
+  box-shadow: 0 1em 1em -0.4em #fefcfe;
+  transform: translateY(-0.25em);
+  transition: all 0.25s ease-out;
+  cursor: pointer;
+}
+
+.board-filter {
+  background-color: #292524;
+  padding: 16px;
+  border-radius: 16px;
+}
+
+.board-filter ul {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.board-filter li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.board-filter .btn-board {
+  width: 100%;
+}
+
+.board-filter .btn-board:hover {
+  background-color: #3b82f6;
+}
+
+@media (max-width: 1000px) {
+  body {
+    padding: 32px 48px;
+  }
+}
+
+@media (max-width: 700px) {
+  .main {
+    display: block;
+  }
+}
+
+.card-form {
+  background-color: #44403c;
+  margin-bottom: 40px;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-radius: 16px;
+}
+
+.card-form input,
+.card-form select {
+  width: 220px;
+  background-color: #78716c;
+  border: none;
+  border-radius: 100px;
+  padding: 16px;
+  font-size: 18px;
+  color: inherit;
+  font-family: inherit;
+}
+
+.card-form input::placeholder {
+  color: #a8a29e;
+}
+
+.card-form input:first-child {
+  flex-grow: 1;
+}
+
+.card-form span {
+  font-weight: 500;
+  font-size: 18px;
+  margin-right: 18px;
+}
+
+@media (max-width: 1000px) {
+  .card-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.card-form input,
+.card-form select {
+  width: auto;
+}
+
+.add-board-form {
+  background-color: #44403c;
+  margin-bottom: 40px;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-radius: 16px;
+  display: none;
+}
+
+.add-board-form.show {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.add-board-form input {
+  width: 220px;
+  background-color: #78716c;
+  border: none;
+  border-radius: 100px;
+  padding: 16px;
+  font-size: 18px;
+  color: inherit;
+  font-family: inherit;
+}
+
+.add-board-form input::placeholder {
+  color: #a8a29e;
+}
+
+.add-board-form button {
+  border: none;
+  font-family: "Montserrat Alternates", sans-serif;
+  line-height: 1;
+  text-transform: uppercase;
+  font-size: 17px;
+  padding: 16px 0 13px;
+  background-image: linear-gradient(135deg, #f80f0b, rgb(255, 0, 208), #8c07c9);
+  color: inherit;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.add-board-form button:hover {
+  border-color: #fdfcfd;
+  box-shadow: 0 1em 1em -0.4em #fefcfe;
+  transform: translateY(-0.25em);
+  transition: all 0.25s ease-out;
+  cursor: pointer;
+}
