@@ -139,8 +139,8 @@ function Header({
   const appTitle = "In Your Face";
   const [board, setBoard] = useState("");
 
-  const handleBoardSubmit = (e) => {
-    e.preventDefault();
+  const handleBoardSubmit = (event) => {
+    event.preventDefault();
 
     if (board) {
       const newBoard = { name: board, color: getRandomColor() };
@@ -168,7 +168,7 @@ function Header({
                 type="text"
                 placeholder="Add a new board..."
                 value={board}
-                onChange={(e) => setBoard(e.target.value)}
+                onChange={(event) => setBoard(event.target.value)}
               />
               <button type="submit">Add Board</button>
             </form>
@@ -211,8 +211,8 @@ function NewCardForm({ setCards, setShowForm, boards, selectedBoard }) {
   const [board, setBoard] = useState("");
   const [charCount, setCharCount] = useState(0);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = (event) => {
+    event.preventDefault();
 
     if (text && isValidHttpUrl(source) && board) {
       const newCard = {
@@ -235,8 +235,8 @@ function NewCardForm({ setCards, setShowForm, boards, selectedBoard }) {
     }
   };
 
-  const handleTextChange = (e) => {
-    const newText = e.target.value;
+  const handleTextChange = (event) => {
+    const newText = event.target.value;
     setText(newText);
     setCharCount(newText.length);
   };
@@ -245,7 +245,7 @@ function NewCardForm({ setCards, setShowForm, boards, selectedBoard }) {
     <form className="card-form" onSubmit={handleSubmit}>
       <input
         type="text"
-        placeholder="Share your inspiration..."
+        placeholder="Speak your truth..."
         value={text}
         onChange={handleTextChange}
         maxLength={200}
@@ -255,10 +255,10 @@ function NewCardForm({ setCards, setShowForm, boards, selectedBoard }) {
         value={source}
         type="text"
         placeholder="Trustworthy source..."
-        onChange={(e) => setSource(e.target.value)}
+        onChange={(event) => setSource(event.target.value)}
       />
       {selectedBoard !== null && (
-        <select value={board} onChange={(e) => setBoard(e.target.value)}>
+        <select value={board} onChange={(event) => setBoard(event.target.value)}>
           <option value="">Choose a board</option>
           {boards.map((board) => (
             <option key={board.name} value={board.name}>
