@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "./style.css";
 
 const initialCards = [
@@ -115,7 +115,7 @@ function App() {
         <Cardlist cards={cards} boards={boards} selectedBoard={selectedBoard} />
       </main>
 
-      <div class="advice">
+      <div className="advice">
         <hr/>
         
         <h2>Can't think of anything?
