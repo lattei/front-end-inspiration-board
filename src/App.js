@@ -115,8 +115,12 @@ function App() {
         <Cardlist cards={cards} boards={boards} selectedBoard={selectedBoard} />
       </main>
 
-      <div>
-        <h2>Can't think of anything?</h2>
+      <div class="advice">
+        <hr/>
+        
+        <h2>Can't think of anything?
+            Try the 'help' button.</h2>
+        
         {advice && <h2>{advice}</h2>}
         <button className="btn btn-large" onClick={handleAdviceClick}>
           Help!
