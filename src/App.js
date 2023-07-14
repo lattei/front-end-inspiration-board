@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./style.css";
 
 const initialCards = [
@@ -62,13 +62,21 @@ function App() {
   const [cards, setCards] = useState(initialCards);
   const [boards, setBoards] = useState(BOARDS);
   const [selectedBoard, setSelectedBoard] = useState("");
+  const [advice, setAdvice] = useState("");
 
-  // Fetch initial data from the server and update state
-  // useEffect(() => {
-  //   fetch('/api/cards')
-  //     .then((response) => response.json())
-  //     .then((data) => setCards(data));
-  // }, []);
+  async function getAdvice() {
+    try {
+      const response = await fetch("https://api.adviceslip.com/advice");
+      const data = await response.json();
+      setAdvice(data.slip.advice);
+    } catch (err) {
+      console.log("Error fetching advice", err);
+    }
+  }
+
+  const handleAdviceClick = () => {
+    getAdvice();
+  };
 
   const addBoard = (newBoard) => {
     setBoards((prevBoards) => [...prevBoards, newBoard]);
@@ -87,15 +95,6 @@ function App() {
   const handleExistingBoardToggle = (boardName) => {
     setSelectedBoard(boardName);
   };
-
-  // Fetch data for the selected board from the server and update state
-  // useEffect(() => {
-  //   if (selectedBoard !== "") {
-  //     fetch(`/api/boards/${selectedBoard}/cards`)
-  //       .then((response) => response.json())
-  //       .then((data) => setCards(data));
-  //   }
-  // }, [selectedBoard]);
 
   return (
     <>
@@ -127,6 +126,14 @@ function App() {
         />
         <Cardlist cards={cards} boards={boards} selectedBoard={selectedBoard} />
       </main>
+
+      <div>
+        <h2>Can't think of anything?</h2>
+        {advice && <h2>{advice}</h2>}
+        <button className="btn btn-large" onClick={handleAdviceClick}>
+          Help!
+        </button>
+      </div>
     </>
   );
 }
@@ -216,6 +223,7 @@ function NewCardForm({ setCards, setShowForm, boards, selectedBoard }) {
 
     if (text && isValidHttpUrl(source) && board) {
       const newCard = {
+        // This is an incorrect way to generate a unique ID, but it will do for now
         id: Math.round(Math.random() * 10000000),
         text,
         source,
@@ -223,7 +231,6 @@ function NewCardForm({ setCards, setShowForm, boards, selectedBoard }) {
         votesInteresting: 0,
         votesMindblowing: 0,
         votesFalse: 0,
-        createdIn: new Date().getFullYear(),
       };
       setCards((cards) => [newCard, ...cards]);
 
@@ -271,7 +278,6 @@ function NewCardForm({ setCards, setShowForm, boards, selectedBoard }) {
     </form>
   );
 }
-
 
 function BoardFilter({ boards, handleExistingBoardToggle, handleAllBoardToggle, showAllBoards }) {
   return (

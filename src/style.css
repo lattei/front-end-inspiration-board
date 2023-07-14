@@ -319,3 +319,25 @@ ul {
   transition: all 0.25s ease-out;
   cursor: pointer;
 }
+
+.help-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.help-container h2 {
+  margin-left: 16px;
+}
+
+@media (max-width: 700px) {
+  .help-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .help-container h2 {
+    margin-top: 16px;
+    margin-left: 0;
+  }
+}
