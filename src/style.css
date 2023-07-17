@@ -362,3 +362,8 @@ ul {
   flex-direction: column;
   gap: 16px;
 }
+
+.advice-button {
+  flex-shrink: 0;
+}
+

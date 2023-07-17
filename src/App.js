@@ -122,7 +122,7 @@ function App() {
         </div>
         <div className="advice-right">
           {advice && <h2>{advice}</h2>}
-          <button className="btn btn-large" onClick={handleAdviceClick}>
+          <button className="btn btn-large advice-button" onClick={handleAdviceClick}>
             Help!
           </button>
         </div>
