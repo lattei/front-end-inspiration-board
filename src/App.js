@@ -116,15 +116,16 @@ function App() {
       </main>
 
       <div className="advice">
-        <hr/>
-        
-        <h2>Can't think of anything?
-            Try the 'help' button.</h2>
-        
-        {advice && <h2>{advice}</h2>}
-        <button className="btn btn-large" onClick={handleAdviceClick}>
-          Help!
-        </button>
+      <div className="advice-left">
+          <h2>Can't think of anything?</h2>
+          <h2>Try the 'help' button.</h2>
+        </div>
+        <div className="advice-right">
+          {advice && <h2>{advice}</h2>}
+          <button className="btn btn-large" onClick={handleAdviceClick}>
+            Help!
+          </button>
+        </div>
       </div>
     </>
   );
