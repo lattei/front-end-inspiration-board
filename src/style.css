@@ -363,7 +363,7 @@ ul {
   gap: 16px;
 }
 
-.advice-button {
-  flex-shrink: 0;
+.advice h2 {
+  font-size: 24px;
+  font-weight: 500;
 }
-

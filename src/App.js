@@ -1,56 +1,37 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./style.css";
-
-const initialCards = [
-  {
-    id: 1,
-    text: "Maybe the dingo ate your baby.",
-    source: "",
-    board: "fabiola",
-    votesInteresting: 24,
-    votesMindblowing: 9,
-    votesFalse: 4,
-    createdIn: 2023,
-  },
-  {
-    id: 2,
-    text: "I wish I had a book for every book I have.",
-    source: "Paraphrase from the movie 'Arthur'.",
-    board: "ann",
-    votesInteresting: 11,
-    votesMindblowing: 2,
-    votesFalse: 0,
-    createdIn: 1989,
-  },
-  {
-    id: 3,
-    text: "I'm not superstitious, but I am a little stitious.",
-    source: "The Office",
-    board: "carline",
-    votesInteresting: 8,
-    votesMindblowing: 3,
-    votesFalse: 1,
-    createdIn: 2015,
-  },
-  {
-    id: 4,
-    text: "I don't know where I'm going from here but I promise it won't be boring.",
-    source: "Ziggy Stardust",
-    board: "erina",
-    votesInteresting: 8,
-    votesMindblowing: 3,
-    votesFalse: 1,
-    createdIn: 2015,
-  },
-];
-
+import axios from "axios";
 
 function App() {
   const [showForm, setShowForm] = useState(false);
-  const [cards, setCards] = useState(initialCards);
-  const [boards, setBoards] = useState(BOARDS);
+  const [cards, setCards] = useState([]);
+  const [boards, setBoards] = useState([]);
   const [selectedBoard, setSelectedBoard] = useState("");
   const [advice, setAdvice] = useState("");
+
+  useEffect(() => {
+    async function fetchCards() {
+      try {
+        const response = await axios.get("/cards");
+        setCards(response.data);
+      } catch (error) {
+        console.log("Error fetching cards", error);
+      }
+    }
+    fetchCards();
+  }, []);
+
+  useEffect(() => {
+    async function fetchBoards() {
+      try {
+        const response = await axios.get("/boards");
+        setBoards(response.data);
+      } catch (error) {
+        console.log("Error fetching boards", error);
+      }
+    }
+    fetchBoards();
+  }, []);
 
   async function getAdvice() {
     try {
@@ -66,8 +47,14 @@ function App() {
     getAdvice();
   };
 
-  const addBoard = (newBoard) => {
-    setBoards((prevBoards) => [...prevBoards, newBoard]);
+  const addBoard = async (newBoard) => {
+    try {
+      const response = await axios.post("/boards", newBoard);
+      const createdBoard = response.data;
+      setBoards((prevBoards) => [...prevBoards, createdBoard]);
+    } catch (error) {
+      console.log("Error creating board", error);
+    }
   };
 
   const handleFormToggle = () => {
@@ -82,6 +69,17 @@ function App() {
 
   const handleExistingBoardToggle = (boardName) => {
     setSelectedBoard(boardName);
+  };
+
+  const handleDeleteCard = async (cardId) => {
+    if (window.confirm("Are you sure you want to delete this card?")) {
+      try {
+        await axios.delete(`/cards/${cardId}`);
+        setCards((prevCards) => prevCards.filter((card) => card._id !== cardId));
+      } catch (error) {
+        console.log("Error deleting card", error);
+      }
+    }
   };
 
   return (
@@ -102,6 +100,7 @@ function App() {
           setShowForm={setShowForm}
           boards={boards}
           selectedBoard={selectedBoard}
+          setSelectedBoard={setSelectedBoard}
         />
       ) : null}
 
@@ -112,11 +111,11 @@ function App() {
           handleAllBoardToggle={() => setSelectedBoard("")}
           showAllBoards={!selectedBoard}
         />
-        <Cardlist cards={cards} boards={boards} selectedBoard={selectedBoard} />
+        <Cardlist cards={cards} boards={boards} selectedBoard={selectedBoard} handleDeleteCard={handleDeleteCard} />
       </main>
 
       <div className="advice">
-      <div className="advice-left">
+        <div className="advice-left">
           <h2>Can't think of anything?</h2>
           <h2>Try the 'help' button.</h2>
         </div>
@@ -131,14 +130,10 @@ function App() {
   );
 }
 
-function Header({
-  showForm,
-  addBoard,
-  handleFormToggle,
-}) {
+function Header({ showForm, setShowForm, boards, addBoard, handleFormToggle, handleNewBoardToggle, handleExistingBoardToggle }) {
   const appTitle = "In Your Face";
   const [board, setBoard] = useState("");
-
+  
   const handleBoardSubmit = (event) => {
     event.preventDefault();
 
@@ -179,13 +174,6 @@ function Header({
   );
 }
 
-const BOARDS = [
-  { name: "fabiola", color: "#eab308" },
-  { name: "ann", color: "#16a34a" },
-  { name: "carline", color: "#0504aa" },
-  { name: "erina", color: "#fb94dc" },
-];
-
 function getRandomColor() {
   const letters = "0123456789ABCDEF";
   let color = "#";
@@ -205,33 +193,34 @@ function isValidHttpUrl(string) {
   return url.protocol === "http:" || url.protocol === "https:";
 }
 
-function NewCardForm({ setCards, setShowForm, boards, selectedBoard }) {
+function NewCardForm({ setCards, setShowForm, boards, selectedBoard, setSelectedBoard }) {
   const [text, setText] = useState("");
-  const [source, setSource] = useState("http://example.com");
+  const [source, setSource] = useState("");
   const [board, setBoard] = useState("");
   const [charCount, setCharCount] = useState(0);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (text && isValidHttpUrl(source) && board) {
       const newCard = {
-        // This is an incorrect way to generate a unique ID, but it will do for now
-        id: Math.round(Math.random() * 10000000),
         text,
         source,
         board,
-        votesInteresting: 0,
-        votesMindblowing: 0,
-        votesFalse: 0,
       };
-      setCards((cards) => [newCard, ...cards]);
 
-      setText("");
-      setSource("");
-      setBoard("");
+      try {
+        const response = await axios.post("/cards", newCard);
+        const createdCard = response.data;
+        setCards((prevCards) => [createdCard, ...prevCards]);
 
-      setShowForm(false);
+        setText("");
+        setSource("");
+        setBoard("");
+        setShowForm(false);
+      } catch (error) {
+        console.log("Error creating card", error);
+      }
     }
   };
 
@@ -261,7 +250,7 @@ function NewCardForm({ setCards, setShowForm, boards, selectedBoard }) {
         <select value={board} onChange={(event) => setBoard(event.target.value)}>
           <option value="">Choose a board</option>
           {boards.map((board) => (
-            <option key={board.name} value={board.name}>
+            <option key={board._id} value={board._id}>
               {board.name.toUpperCase()}
             </option>
           ))}
@@ -284,39 +273,31 @@ function BoardFilter({ boards, handleExistingBoardToggle, handleAllBoardToggle, 
 
         {showAllBoards && (
           <li className="board">
-            {/* Add code to fetch all boards from the server */}
-            {/* Example:
-              fetch('/api/boards')
-                .then((response) => response.json())
-                .then((data) => setBoards(data));
-            */}
+            {boards.map((board) => (
+              <button
+                key={board._id}
+                className="btn btn-board"
+                style={{ backgroundColor: board.color }}
+                onClick={() => handleExistingBoardToggle(board._id)}
+              >
+                {board.name}
+              </button>
+            ))}
           </li>
         )}
-
-        {boards.map((board) => (
-          <li className="board" key={board.name}>
-            <button
-              className="btn btn-board"
-              style={{ backgroundColor: board.color }}
-              onClick={() => handleExistingBoardToggle(board.name)}
-            >
-              {board.name}
-            </button>
-          </li>
-        ))}
       </ul>
     </aside>
   );
 }
 
-function Cardlist({ cards, boards, selectedBoard }) {
+function Cardlist({ cards, boards, selectedBoard, handleDeleteCard }) {
   const filteredCards = selectedBoard ? cards.filter((card) => card.board === selectedBoard) : cards;
 
   return (
     <section>
       <ul className="cards-list">
         {filteredCards.map((card) => (
-          <Card key={card.id} card={card} boards={boards} />
+          <Card key={card._id} card={card} boards={boards} handleDeleteCard={handleDeleteCard} />
         ))}
       </ul>
       <p>There are {filteredCards.length} inspirations here. Add your own!</p>
@@ -324,15 +305,13 @@ function Cardlist({ cards, boards, selectedBoard }) {
   );
 }
 
-function Card({ card, boards }) {
-  const board = boards.find((board) => board.name === card.board);
-  const [votes, setVotes] = useState(card);
+function Card({ card, boards, handleDeleteCard }) {
+  const selectedBoard = boards.find((board) => board._id === card.board);
 
-  const incrementVote = (type) => {
-    setVotes((prevVotes) => ({
-      ...prevVotes,
-      [type]: prevVotes[type] + 1,
-    }));
+  const handleCardDelete = () => {
+    if (window.confirm("Are you sure you want to delete this card?")) {
+      handleDeleteCard(card._id);
+    }
   };
 
   return (
@@ -343,21 +322,23 @@ function Card({ card, boards }) {
           (source)
         </a>
       </p>
-      {board && (
+      {selectedBoard && (
         <span
           className="tag"
           style={{
-            backgroundColor: board.color,
+            backgroundColor: selectedBoard.color,
           }}
         >
-          {board.name}
+          {selectedBoard.name}
         </span>
       )}
       <div className="vote-buttons">
-        <button onClick={() => incrementVote("votesInteresting")}>👍 {votes.votesInteresting}</button>
-        <button onClick={() => incrementVote("votesMindblowing")}>🤯 {votes.votesMindblowing}</button>
-        <button onClick={() => incrementVote("votesFalse")}>⛔️ {votes.votesFalse}</button>
+        <button>👍 Like!{card.likes}</button>
+        <button>⛔️ Delete this card.</button>
       </div>
+      <button className="btn btn-delete" onClick={handleCardDelete}>
+        Delete
+      </button>
     </li>
   );
 }
