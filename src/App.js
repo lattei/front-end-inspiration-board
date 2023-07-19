@@ -10,28 +10,27 @@ function App() {
   const [advice, setAdvice] = useState("");
 
   useEffect(() => {
-    async function fetchCards() {
-      try {
-        const response = await axios.get("/cards");
-        setCards(response.data);
-      } catch (error) {
-        console.log("Error fetching cards", error);
-      }
-    }
     fetchCards();
-  }, []);
-
-  useEffect(() => {
-    async function fetchBoards() {
-      try {
-        const response = await axios.get("/boards");
-        setBoards(response.data);
-      } catch (error) {
-        console.log("Error fetching boards", error);
-      }
-    }
     fetchBoards();
   }, []);
+
+  async function fetchCards() {
+    try {
+      const response = await axios.get("/cards");
+      setCards(response.data);
+    } catch (error) {
+      console.log("Error fetching cards", error);
+    }
+  }
+
+  async function fetchBoards() {
+    try {
+      const response = await axios.get("/boards");
+      setBoards(response.data);
+    } catch (error) {
+      console.log("Error fetching boards", error);
+    }
+  }
 
   async function getAdvice() {
     try {
@@ -75,7 +74,7 @@ function App() {
     if (window.confirm("Are you sure you want to delete this card?")) {
       try {
         await axios.delete(`/cards/${cardId}`);
-        setCards((prevCards) => prevCards.filter((card) => card._id !== cardId));
+        setCards((prevCards) => prevCards.filter((card) => card.id !== cardId));
       } catch (error) {
         console.log("Error deleting card", error);
       }
@@ -100,7 +99,6 @@ function App() {
           setShowForm={setShowForm}
           boards={boards}
           selectedBoard={selectedBoard}
-          setSelectedBoard={setSelectedBoard}
         />
       ) : null}
 
@@ -111,7 +109,7 @@ function App() {
           handleAllBoardToggle={() => setSelectedBoard("")}
           showAllBoards={!selectedBoard}
         />
-        <Cardlist cards={cards} boards={boards} selectedBoard={selectedBoard} handleDeleteCard={handleDeleteCard} />
+        <CardList cards={cards} boards={boards} selectedBoard={selectedBoard} handleDeleteCard={handleDeleteCard} />
       </main>
 
       <div className="advice">
@@ -130,11 +128,11 @@ function App() {
   );
 }
 
-function Header({ showForm, setShowForm, boards, addBoard, handleFormToggle, handleNewBoardToggle, handleExistingBoardToggle }) {
+function Header({ showForm, addBoard, handleFormToggle }) {
   const appTitle = "In Your Face";
   const [board, setBoard] = useState("");
-  
-  const handleBoardSubmit = (event) => {
+
+  const handleBoardSubmit = async (event) => {
     event.preventDefault();
 
     if (board) {
@@ -193,11 +191,10 @@ function isValidHttpUrl(string) {
   return url.protocol === "http:" || url.protocol === "https:";
 }
 
-function NewCardForm({ setCards, setShowForm, boards, selectedBoard, setSelectedBoard }) {
+function NewCardForm({ setCards, setShowForm, boards, selectedBoard }) {
   const [text, setText] = useState("");
-  const [source, setSource] = useState("");
+  const [source, setSource] = useState("http://example.com");
   const [board, setBoard] = useState("");
-  const [charCount, setCharCount] = useState(0);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -224,33 +221,26 @@ function NewCardForm({ setCards, setShowForm, boards, selectedBoard, setSelected
     }
   };
 
-  const handleTextChange = (event) => {
-    const newText = event.target.value;
-    setText(newText);
-    setCharCount(newText.length);
-  };
-
   return (
     <form className="card-form" onSubmit={handleSubmit}>
       <input
         type="text"
         placeholder="Speak your truth..."
         value={text}
-        onChange={handleTextChange}
+        onChange={(event) => setText(event.target.value)}
         maxLength={200}
-      ></input>
-      <div className="char-counter">{charCount}/200</div>
+      />
       <input
-        value={source}
         type="text"
         placeholder="Trustworthy source..."
+        value={source}
         onChange={(event) => setSource(event.target.value)}
       />
       {selectedBoard !== null && (
         <select value={board} onChange={(event) => setBoard(event.target.value)}>
           <option value="">Choose a board</option>
           {boards.map((board) => (
-            <option key={board._id} value={board._id}>
+            <option key={board.id} value={board.id}>
               {board.name.toUpperCase()}
             </option>
           ))}
@@ -275,10 +265,10 @@ function BoardFilter({ boards, handleExistingBoardToggle, handleAllBoardToggle, 
           <li className="board">
             {boards.map((board) => (
               <button
-                key={board._id}
+                key={board.id}
                 className="btn btn-board"
                 style={{ backgroundColor: board.color }}
-                onClick={() => handleExistingBoardToggle(board._id)}
+                onClick={() => handleExistingBoardToggle(board.id)}
               >
                 {board.name}
               </button>
@@ -290,14 +280,14 @@ function BoardFilter({ boards, handleExistingBoardToggle, handleAllBoardToggle, 
   );
 }
 
-function Cardlist({ cards, boards, selectedBoard, handleDeleteCard }) {
+function CardList({ cards, boards, selectedBoard, handleDeleteCard }) {
   const filteredCards = selectedBoard ? cards.filter((card) => card.board === selectedBoard) : cards;
 
   return (
     <section>
       <ul className="cards-list">
         {filteredCards.map((card) => (
-          <Card key={card._id} card={card} boards={boards} handleDeleteCard={handleDeleteCard} />
+          <Card key={card.id} card={card} boards={boards} handleDeleteCard={handleDeleteCard} />
         ))}
       </ul>
       <p>There are {filteredCards.length} inspirations here. Add your own!</p>
@@ -306,11 +296,11 @@ function Cardlist({ cards, boards, selectedBoard, handleDeleteCard }) {
 }
 
 function Card({ card, boards, handleDeleteCard }) {
-  const selectedBoard = boards.find((board) => board._id === card.board);
+  const selectedBoard = boards.find((board) => board.id === card.board);
 
   const handleCardDelete = () => {
     if (window.confirm("Are you sure you want to delete this card?")) {
-      handleDeleteCard(card._id);
+      handleDeleteCard(card.id);
     }
   };
 
@@ -333,12 +323,9 @@ function Card({ card, boards, handleDeleteCard }) {
         </span>
       )}
       <div className="vote-buttons">
-        <button>👍 Like!{card.likes}</button>
-        <button>⛔️ Delete this card.</button>
+        <button>👍 {card.likes}</button>
+        <button onClick={handleCardDelete}>⛔️ Delete</button>
       </div>
-      <button className="btn btn-delete" onClick={handleCardDelete}>
-        Delete
-      </button>
     </li>
   );
 }
