@@ -8,8 +8,8 @@ function App() {
   const [boards, setBoards] = useState([]);
   const [selectedBoard, setSelectedBoard] = useState("");
   const [advice, setAdvice] = useState("");
-  
-
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [deleteCardId, setDeleteCardId] = useState(null);
 
   useEffect(() => {
     fetchCards();
@@ -72,14 +72,39 @@ function App() {
     setSelectedBoard(boardName);
   };
 
-  const handleDeleteCard = async (cardId) => {
-    if (window.confirm("Are you sure you want to delete this card?")) {
+  const handleConfirmDelete = (cardId) => {
+    setDeleteCardId(cardId);
+    setShowConfirmation(true);
+  };
+
+  const handleDeleteConfirmation = async (confirmed) => {
+    if (confirmed) {
       try {
-        await axios.delete(`/cards/${cardId}`);
-        setCards((prevCards) => prevCards.filter((card) => card.id !== cardId));
+        await axios.delete(`/cards/${deleteCardId}`);
+        setCards((prevCards) => prevCards.filter((card) => card.id !== deleteCardId));
       } catch (error) {
         console.log("Error deleting card", error);
       }
+    }
+    setShowConfirmation(false);
+  };
+
+  const handleIncrementLikes = async (cardId) => {
+    try {
+      await axios.patch(`/cards/${cardId}/incrementLikes`);
+      setCards((prevCards) =>
+        prevCards.map((card) => {
+          if (card.id === cardId) {
+            return {
+              ...card,
+              likes: card.likes + 1,
+            };
+          }
+          return card;
+        })
+      );
+    } catch (error) {
+      console.log("Error incrementing likes", error);
     }
   };
 
@@ -95,14 +120,14 @@ function App() {
         handleExistingBoardToggle={handleExistingBoardToggle}
       />
 
-      {showForm ? (
+      {showForm && (
         <NewCardForm
           setCards={setCards}
           setShowForm={setShowForm}
           boards={boards}
           selectedBoard={selectedBoard}
         />
-      ) : null}
+      )}
 
       <main className="main">
         <BoardFilter
@@ -111,7 +136,13 @@ function App() {
           handleAllBoardToggle={() => setSelectedBoard("")}
           showAllBoards={!selectedBoard}
         />
-        <CardList cards={cards} boards={boards} selectedBoard={selectedBoard} handleDeleteCard={handleDeleteCard} />
+        <CardList
+          cards={cards}
+          boards={boards}
+          selectedBoard={selectedBoard}
+          handleConfirmDelete={handleConfirmDelete}
+          handleIncrementLikes={handleIncrementLikes}
+        />
       </main>
 
       <div className="advice">
@@ -126,11 +157,18 @@ function App() {
           </button>
         </div>
       </div>
+
+      {showConfirmation && (
+        <ConfirmationDialog
+          showConfirmation={showConfirmation}
+          handleDeleteConfirmation={handleDeleteConfirmation}
+        />
+      )}
     </>
   );
 }
 
-function Header({ showForm, addBoard, handleFormToggle }) {
+function Header({ showForm, setShowForm, addBoard, handleFormToggle, handleNewBoardToggle, handleExistingBoardToggle }) {
   const appTitle = "In Your Face";
   const [board, setBoard] = useState("");
 
@@ -183,29 +221,18 @@ function getRandomColor() {
   return color;
 }
 
-function isValidHttpUrl(string) {
-  let url;
-  try {
-    url = new URL(string);
-  } catch (_) {
-    return false;
-  }
-  return url.protocol === "http:" || url.protocol === "https:";
-}
-
 function NewCardForm({ setCards, setShowForm, boards, selectedBoard }) {
   const [text, setText] = useState("");
-  const [source, setSource] = useState("http://example.com");
   const [board, setBoard] = useState("");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (text && isValidHttpUrl(source) && board) {
+    if (text && board) {
       const newCard = {
         text,
-        source,
         board,
+        likes: 0,
       };
 
       try {
@@ -214,7 +241,6 @@ function NewCardForm({ setCards, setShowForm, boards, selectedBoard }) {
         setCards((prevCards) => [createdCard, ...prevCards]);
 
         setText("");
-        setSource("");
         setBoard("");
         setShowForm(false);
       } catch (error) {
@@ -231,13 +257,6 @@ function NewCardForm({ setCards, setShowForm, boards, selectedBoard }) {
         value={text}
         onChange={(event) => setText(event.target.value)}
         maxLength={40}
-      />
-      {/* <div className="char-counter">{charCount}/40</div> */}
-      <input
-        type="text"
-        placeholder="Trustworthy source..."
-        value={source}
-        onChange={(event) => setSource(event.target.value)}
       />
       {selectedBoard !== null && (
         <select value={board} onChange={(event) => setBoard(event.target.value)}>
@@ -283,14 +302,20 @@ function BoardFilter({ boards, handleExistingBoardToggle, handleAllBoardToggle, 
   );
 }
 
-function CardList({ cards, boards, selectedBoard, handleDeleteCard }) {
+function CardList({ cards, boards, selectedBoard, handleConfirmDelete, handleIncrementLikes }) {
   const filteredCards = selectedBoard ? cards.filter((card) => card.board === selectedBoard) : cards;
 
   return (
     <section>
       <ul className="cards-list">
         {filteredCards.map((card) => (
-          <Card key={card.id} card={card} boards={boards} handleDeleteCard={handleDeleteCard} />
+          <Card
+            key={card.id}
+            card={card}
+            boards={boards}
+            handleConfirmDelete={handleConfirmDelete}
+            handleIncrementLikes={handleIncrementLikes}
+          />
         ))}
       </ul>
       <p>There are {filteredCards.length} inspirations here. Add your own!</p>
@@ -298,23 +323,20 @@ function CardList({ cards, boards, selectedBoard, handleDeleteCard }) {
   );
 }
 
-function Card({ card, boards, handleDeleteCard }) {
+function Card({ card, boards, handleConfirmDelete, handleIncrementLikes }) {
   const selectedBoard = boards.find((board) => board.id === card.board);
 
-  const handleCardDelete = () => {
-    if (window.confirm("Are you sure you want to delete this card?")) {
-      handleDeleteCard(card.id);
-    }
+  const handleDeleteClick = () => {
+    handleConfirmDelete(card.id);
+  };
+
+  const handleLikeClick = () => {
+    handleIncrementLikes(card.id);
   };
 
   return (
     <li className="card">
-      <p>
-        {card.text}
-        <a className="source" href={card.source} target="_blank" rel="noopener noreferrer">
-          (source)
-        </a>
-      </p>
+      <p>{card.text}</p>
       {selectedBoard && (
         <span
           className="tag"
@@ -326,10 +348,28 @@ function Card({ card, boards, handleDeleteCard }) {
         </span>
       )}
       <div className="vote-buttons">
-        <button>👍 {card.likes}</button>
-        <button onClick={handleCardDelete}>⛔️ Delete</button>
+        <button onClick={handleLikeClick}>👍 {card.likes}</button>
+        <button onClick={handleDeleteClick}>⛔️ Delete</button>
       </div>
     </li>
+  );
+}
+
+function ConfirmationDialog({ showConfirmation, handleDeleteConfirmation }) {
+  return (
+    <div className={`confirmation-dialog ${showConfirmation ? "show" : ""}`}>
+      <div className="confirmation-content">
+        <h2>Are you sure you want to delete this card?</h2>
+        <div className="confirmation-actions">
+          <button className="btn btn-delete" onClick={() => handleDeleteConfirmation(true)}>
+            Yes, Delete
+          </button>
+          <button className="btn btn-cancel" onClick={() => handleDeleteConfirmation(false)}>
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
