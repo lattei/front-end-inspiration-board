@@ -228,7 +228,7 @@ function NewCardForm({ setCards, setShowForm, boards, selectedBoard }) {
         placeholder="Speak your truth..."
         value={text}
         onChange={(event) => setText(event.target.value)}
-        maxLength={200}
+        maxLength={40}
       />
       <input
         type="text"
