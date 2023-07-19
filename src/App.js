@@ -8,6 +8,8 @@ function App() {
   const [boards, setBoards] = useState([]);
   const [selectedBoard, setSelectedBoard] = useState("");
   const [advice, setAdvice] = useState("");
+  
+
 
   useEffect(() => {
     fetchCards();
@@ -230,6 +232,7 @@ function NewCardForm({ setCards, setShowForm, boards, selectedBoard }) {
         onChange={(event) => setText(event.target.value)}
         maxLength={40}
       />
+      {/* <div className="char-counter">{charCount}/40</div> */}
       <input
         type="text"
         placeholder="Trustworthy source..."
