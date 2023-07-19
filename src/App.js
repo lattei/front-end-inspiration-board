@@ -250,9 +250,9 @@ function NewCardForm({ setCards, setShowForm, boards, selectedBoard }) {
         placeholder="Speak your truth..."
         value={text}
         onChange={handleTextChange}
-        maxLength={200}
+        maxLength={40}
       ></input>
-      <div className="char-counter">{charCount}/200</div>
+      <div className="char-counter">{charCount}/40</div>
       {selectedBoard !== null && (
         <select value={board} onChange={(event) => setBoard(event.target.value)}>
           <option value="">Choose a board</option>
