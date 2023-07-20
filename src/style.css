@@ -166,6 +166,7 @@ ul {
 .btn-board {
   width: 100%;
   background-image: none;
+  width:150px;
 }
 
 .btn-category {
