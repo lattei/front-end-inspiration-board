@@ -314,6 +314,7 @@ function NewCardForm({ setCards, setShowForm, boards, selectedBoard }) {
         onChange={(event) => setText(event.target.value)}
         maxLength={40}
       ></input>
+      
       {selectedBoard !== null && (
         <select value={board} onChange={(event) => setBoard(event.target.value)}>
           <option value="">Choose a board</option>
