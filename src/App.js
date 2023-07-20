@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./style.css";
 import axios from "axios";
 import Header from "./components/header";
+import Card from "./components/card";
 
 function App() {
   const [showForm, setShowForm] = useState(false);
@@ -320,37 +321,37 @@ function NewCardForm({ setCards, setShowForm, boards, selectedBoard }) {
   );
 }
 
-function Card({ card, boards, handleConfirmDelete, handleIncrementLikes }) {
-  const board = boards.find((board) => board.name === card.board);
+// function Card({ card, boards, handleConfirmDelete, handleIncrementLikes }) {
+//   const board = boards.find((board) => board.name === card.board);
 
-  const handleDeleteClick = () => {
-    handleConfirmDelete(card.id);
-  };
+//   const handleDeleteClick = () => {
+//     handleConfirmDelete(card.id);
+//   };
 
-  const handleLikeClick = (category) => {
-    handleIncrementLikes(card.id, category);
-  };
+//   const handleLikeClick = (category) => {
+//     handleIncrementLikes(card.id, category);
+//   };
 
-  return (
-    <li className="card">
-      <p>{card.text}</p>
-      {board && (
-        <span
-          className="tag"
-          style={{
-            backgroundColor: board.color,
-          }}
-        >
-          {board.name}
-        </span>
-      )}
-      <div className="vote-buttons">
-        <button onClick={() => handleLikeClick("votesInteresting")}>Likes: {card.votesInteresting}</button>
-        <button onClick={handleDeleteClick}>⛔️ Delete</button>
-      </div>
-    </li>
-  );
-}
+//   return (
+//     <li className="card">
+//       <p>{card.text}</p>
+//       {board && (
+//         <span
+//           className="tag"
+//           style={{
+//             backgroundColor: board.color,
+//           }}
+//         >
+//           {board.name}
+//         </span>
+//       )}
+//       <div className="vote-buttons">
+//         <button onClick={() => handleLikeClick("votesInteresting")}>Likes: {card.votesInteresting}</button>
+//         <button onClick={handleDeleteClick}>⛔️ Delete</button>
+//       </div>
+//     </li>
+//   );
+// }
 
 function ConfirmationDialog({ showConfirmation, handleDeleteConfirmation }) {
   return (
