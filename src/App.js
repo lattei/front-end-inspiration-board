@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import "./style.css";
 import axios from "axios";
 
-//NONE of the calls has the URL for the server.
-
 function App() {
   const [showForm, setShowForm] = useState(false);
   const [cards, setCards] = useState([]);
@@ -12,6 +10,8 @@ function App() {
   const [advice, setAdvice] = useState("");
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [deleteCardId, setDeleteCardId] = useState(null);
+  const [sortOrder, setSortOrder] = useState("desc");
+  const [sortOption, setSortOption] = useState("likes");
 
   useEffect(() => {
     fetchCards();
@@ -50,14 +50,8 @@ function App() {
     getAdvice();
   };
 
-  const addBoard = async (newBoard) => {
-    try {
-      const response = await axios.post("/boards", newBoard);
-      const createdBoard = response.data;
-      setBoards((prevBoards) => [...prevBoards, createdBoard]);
-    } catch (error) {
-      console.log("Error creating board", error);
-    }
+  const addBoard = (newBoard) => {
+    setBoards((prevBoards) => [...prevBoards, newBoard]);
   };
 
   const handleFormToggle = () => {
@@ -79,36 +73,53 @@ function App() {
     setShowConfirmation(true);
   };
 
-  const handleDeleteConfirmation = async (confirmed) => {
+  const handleDeleteConfirmation = (confirmed) => {
     if (confirmed) {
-      try {
-        await axios.delete(`/cards/${deleteCardId}`);
-        setCards((prevCards) => prevCards.filter((card) => card.id !== deleteCardId));
-      } catch (error) {
-        console.log("Error deleting card", error);
-      }
+      setCards((prevCards) => prevCards.filter((card) => card.id !== deleteCardId));
     }
     setShowConfirmation(false);
   };
 
-  const handleIncrementLikes = async (cardId) => {
-    try {
-      await axios.patch(`/cards/${cardId}/incrementLikes`);
-      setCards((prevCards) =>
-        prevCards.map((card) => {
-          if (card.id === cardId) {
-            return {
-              ...card,
-              likes: card.likes + 1,
-            };
-          }
-          return card;
-        })
-      );
-    } catch (error) {
-      console.log("Error incrementing likes", error);
-    }
+  const handleIncrementLikes = (cardId, category) => {
+    setCards((prevCards) =>
+      prevCards.map((card) => {
+        if (card.id === cardId) {
+          return {
+            ...card,
+            [category]: card[category] + 1,
+          };
+        }
+        return card;
+      })
+    );
   };
+
+  const handleSortOptionChange = (event) => {
+    setSortOption(event.target.value);
+  };
+
+  const handleSortOrderChange = (event) => {
+    setSortOrder(event.target.value);
+  };
+
+  const filteredCards = selectedBoard ? cards.filter((card) => card.board === selectedBoard) : cards;
+
+  const sortedCards = [...filteredCards].sort((a, b) => {
+    if (sortOption === "likes") {
+      if (sortOrder === "asc") {
+        return a.votesInteresting - b.votesInteresting;
+      } else {
+        return b.votesInteresting - a.votesInteresting;
+      }
+    } else if (sortOption === "id") {
+      if (sortOrder === "asc") {
+        return a.id - b.id;
+      } else {
+        return b.id - a.id;
+      }
+    }
+    return 0;
+  });
 
   return (
     <>
@@ -132,19 +143,57 @@ function App() {
       )}
 
       <main className="main">
-        <BoardFilter
-          boards={boards}
-          handleExistingBoardToggle={handleExistingBoardToggle}
-          handleAllBoardToggle={() => setSelectedBoard("")}
-          showAllBoards={!selectedBoard}
-        />
-        <CardList
-          cards={cards}
-          boards={boards}
-          selectedBoard={selectedBoard}
-          handleConfirmDelete={handleConfirmDelete}
-          handleIncrementLikes={handleIncrementLikes}
-        />
+        <section className="board-filter">
+          <ul>
+            <li className="board">
+              <button className="btn btn-all-boards" onClick={() => setSelectedBoard("")}>
+                All
+              </button>
+            </li>
+            {boards.map((board) => (
+              <li className="board" key={board.name}>
+                <button
+                  className="btn btn-board"
+                  style={{ backgroundColor: board.color }}
+                  onClick={() => handleExistingBoardToggle(board.name)}
+                >
+                  {board.name}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+        <section>
+          <div className="sort-options">
+            <label>
+              Sort by:
+              <select value={sortOption} onChange={handleSortOptionChange} className="select-menu">
+                <option value="likes"> Likes </option>
+                <option value="id"> ID </option>
+              </select>
+            </label>
+            <label>
+              Sort order:
+              <select value={sortOrder} onChange={handleSortOrderChange} className="select-menu">
+                <option value="desc">Descending</option>
+                <option value="asc">Ascending</option>
+              </select>
+            </label>
+            <p className="count">There are {filteredCards.length} inspirations here. Add your own!</p>
+          </div>
+
+          <ul className="cards-list">
+            {sortedCards.map((card) => (
+              <Card
+                key={card.id}
+                card={card}
+                boards={boards}
+                handleConfirmDelete={handleConfirmDelete}
+                handleIncrementLikes={handleIncrementLikes}
+              />
+            ))}
+          </ul>
+        </section>
       </main>
 
       <div className="advice">
@@ -171,10 +220,10 @@ function App() {
 }
 
 function Header({ showForm, setShowForm, addBoard, handleFormToggle, handleNewBoardToggle, handleExistingBoardToggle }) {
-  const appTitle = "In Your Face";
+  const appTitle = "Everything I've Learned, I Got From...";
   const [board, setBoard] = useState("");
 
-  const handleBoardSubmit = async (event) => {
+  const handleBoardSubmit = (event) => {
     event.preventDefault();
 
     if (board) {
@@ -187,7 +236,7 @@ function Header({ showForm, setShowForm, addBoard, handleFormToggle, handleNewBo
   return (
     <header className="header">
       <div className="logo">
-        <img src="logo.png" alt="In your face logo" />
+        <img src="logo.png" alt="Everything I've Learned logo" />
         <h1>{appTitle}</h1>
       </div>
       <button className="btn btn-large btn-open" onClick={handleFormToggle}>
@@ -227,27 +276,22 @@ function NewCardForm({ setCards, setShowForm, boards, selectedBoard }) {
   const [text, setText] = useState("");
   const [board, setBoard] = useState("");
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
 
     if (text && board) {
       const newCard = {
+        id: Math.round(Math.random() * 10000000),
         text,
         board,
-        likes: 0,
+        votesInteresting: 0,
       };
+      setCards((cards) => [newCard, ...cards]);
 
-      try {
-        const response = await axios.post("/cards", newCard);
-        const createdCard = response.data;
-        setCards((prevCards) => [createdCard, ...prevCards]);
+      setText("");
+      setBoard("");
 
-        setText("");
-        setBoard("");
-        setShowForm(false);
-      } catch (error) {
-        console.log("Error creating card", error);
-      }
+      setShowForm(false);
     }
   };
 
@@ -259,12 +303,12 @@ function NewCardForm({ setCards, setShowForm, boards, selectedBoard }) {
         value={text}
         onChange={(event) => setText(event.target.value)}
         maxLength={40}
-      />
+      ></input>
       {selectedBoard !== null && (
         <select value={board} onChange={(event) => setBoard(event.target.value)}>
           <option value="">Choose a board</option>
           {boards.map((board) => (
-            <option key={board.id} value={board.id}>
+            <option key={board.name} value={board.name}>
               {board.name.toUpperCase()}
             </option>
           ))}
@@ -275,82 +319,32 @@ function NewCardForm({ setCards, setShowForm, boards, selectedBoard }) {
   );
 }
 
-function BoardFilter({ boards, handleExistingBoardToggle, handleAllBoardToggle, showAllBoards }) {
-  return (
-    <aside className="board-filter">
-      <ul>
-        <li className="board">
-          <button className="btn btn-all-boards" onClick={handleAllBoardToggle}>
-            All
-          </button>
-        </li>
-
-        {showAllBoards && (
-          <li className="board">
-            {boards.map((board) => (
-              <button
-                key={board.id}
-                className="btn btn-board"
-                style={{ backgroundColor: board.color }}
-                onClick={() => handleExistingBoardToggle(board.id)}
-              >
-                {board.name}
-              </button>
-            ))}
-          </li>
-        )}
-      </ul>
-    </aside>
-  );
-}
-
-function CardList({ cards, boards, selectedBoard, handleConfirmDelete, handleIncrementLikes }) {
-  const filteredCards = selectedBoard ? cards.filter((card) => card.board === selectedBoard) : cards;
-
-  return (
-    <section>
-      <ul className="cards-list">
-        {filteredCards.map((card) => (
-          <Card
-            key={card.id}
-            card={card}
-            boards={boards}
-            handleConfirmDelete={handleConfirmDelete}
-            handleIncrementLikes={handleIncrementLikes}
-          />
-        ))}
-      </ul>
-      <p>There are {filteredCards.length} inspirations here. Add your own!</p>
-    </section>
-  );
-}
-
 function Card({ card, boards, handleConfirmDelete, handleIncrementLikes }) {
-  const selectedBoard = boards.find((board) => board.id === card.board);
+  const board = boards.find((board) => board.name === card.board);
 
   const handleDeleteClick = () => {
     handleConfirmDelete(card.id);
   };
 
-  const handleLikeClick = () => {
-    handleIncrementLikes(card.id);
+  const handleLikeClick = (category) => {
+    handleIncrementLikes(card.id, category);
   };
 
   return (
     <li className="card">
       <p>{card.text}</p>
-      {selectedBoard && (
+      {board && (
         <span
           className="tag"
           style={{
-            backgroundColor: selectedBoard.color,
+            backgroundColor: board.color,
           }}
         >
-          {selectedBoard.name}
+          {board.name}
         </span>
       )}
       <div className="vote-buttons">
-        <button onClick={handleLikeClick}>👍 {card.likes}</button>
+        <button onClick={() => handleLikeClick("votesInteresting")}>Likes: {card.votesInteresting}</button>
         <button onClick={handleDeleteClick}>⛔️ Delete</button>
       </div>
     </li>
