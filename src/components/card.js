@@ -25,7 +25,7 @@ function Card({ card, boards, handleConfirmDelete, handleIncrementLikes }) {
             </span>
             )}
             <div className="vote-buttons">
-            <button onClick={() => handleLikeClick("votesInteresting")}>Likes: {card.votesInteresting}</button>
+            <button onClick={() => handleLikeClick("votesInteresting")}> 👍 Likes: {card.votesInteresting}</button>
             <button onClick={handleDeleteClick}>⛔️ Delete</button>
             </div>
         </li>

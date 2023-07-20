@@ -22,6 +22,12 @@ function NewCardForm({ setCards, setShowForm, boards, selectedBoard }) {
             setShowForm(false);
         }
         };
+        const handleTextChange = (event) => {
+            setText(event.target.value);
+        };
+        const characterCount=  text.length;
+        const maxCharacterCount = 40 - characterCount;
+
     
         return (
         <form className="card-form" onSubmit={handleSubmit}>
@@ -32,6 +38,8 @@ function NewCardForm({ setCards, setShowForm, boards, selectedBoard }) {
             onChange={(event) => setText(event.target.value)}
             maxLength={40}
             ></input>
+
+            <div className="character-counter">{maxCharacterCount} characters remaining</div>   
             {selectedBoard !== null && (
             <select value={board} onChange={(event) => setBoard(event.target.value)}>
                 <option value="">Choose a board</option>
