@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 function Card({ card, boards, handleConfirmDelete, handleIncrementLikes }) {
     const board = boards.find((board) => board.name === card.board);

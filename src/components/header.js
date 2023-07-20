@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 function Header({ showForm, setShowForm, addBoard, handleFormToggle, handleNewBoardToggle, handleExistingBoardToggle }) {
-    const appTitle = "Everything I've Learned, I Got From...";
+    const appTitle = "Everything I Know, I Got From...";
     const [board, setBoard] = useState("");
 
     const handleBoardSubmit = (event) => {
@@ -52,5 +52,6 @@ function getRandomColor() {
     }
     return color;
 }
+
 
 export default Header;
