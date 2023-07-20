@@ -171,7 +171,7 @@ function App() {
           <div className="sort-options">
             <label>
               Sort by:
-              <select value={sortOption} onChange={handleSortOptionChange} className="select-menu">
+              <select value={sortOption} onChange={handleSortOptionChange}  className="select-menu">
                 <option value="likes"> Likes </option>
                 <option value="id"> ID </option>
               </select>
@@ -201,17 +201,20 @@ function App() {
       </main>
 
       <div className="advice">
-        <div className="advice-left">
-          <h2>Can't think of anything?</h2>
-          <h2>Try the 'help' button.</h2>
-        </div>
-        <div className="advice-right">
-          {advice && <h2>{advice}</h2>}
-          <button className="btn btn-large advice-button" onClick={handleAdviceClick}>
-            Help!
-          </button>
-        </div>
-      </div>
+  <div className="advice-left">
+    <h2>Can't think of anything?</h2>
+    <h2>Try the 'help' button.</h2>
+  </div>
+  <div className="advice-right"> 
+    {advice && <h2>{advice}</h2>}
+  </div>
+  <div className="advice-button">
+    <button className="btn btn-large advice-button" onClick={handleAdviceClick}>
+      Help!
+    </button>
+  </div>
+</div>
+
 
       {showConfirmation && (
         <ConfirmationDialog

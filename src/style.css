@@ -348,7 +348,6 @@ ul {
   padding: 16px 24px;
   border-radius: 16px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
   gap: 16px;
 }
@@ -361,12 +360,15 @@ ul {
 
 .advice-right {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  color:#b940f0;
   gap: 16px;
 }
 
 .advice-button {
   flex-shrink: 0;
+  width: 150px;
+  margin-left: auto;
 }
 
 .confirmation-dialog {
@@ -445,12 +447,19 @@ ul {
   gap: 16px;
 }
 
+.sort-options button,
+.sort-options select {
+  width: 150px; 
+}
+
+
 .sort-options select{
   background-color: #b940f0;
   color: inherit;
   font-family: inherit;
   border: none;
   border-radius: 100px;
+  width: 150px;
   padding: 16px 0 13px;
   font-size: 18px;
   margin-top: 8px;
@@ -461,4 +470,8 @@ ul {
   font-weight: 500;
   margin-top: 18px;
   margin-left: auto;
+}
+
+.select-menu {
+  text-align: center;
 }
