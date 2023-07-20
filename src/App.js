@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import "./style.css";
 import axios from "axios";
 
+//NONE of the calls has the URL for the server.
+
 function App() {
   const [showForm, setShowForm] = useState(false);
   const [cards, setCards] = useState([]);
