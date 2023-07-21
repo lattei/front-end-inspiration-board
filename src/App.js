@@ -58,32 +58,32 @@ function App() {
     setBoards((prevBoards) => [...prevBoards, newBoard]);
   };
 
-  async function updateBoard(boardId, updatedData) {
-    try {
-      const response = await axios.put(`"https://in-your-face-back-end.onrender.com/boards/${boardId}`, updatedData);//$ for template literals and string interpolation. Not sure. 
+  // async function updateBoard(boardId, updatedData) {
+  //   try {
+  //     const response = await axios.put(`"https://in-your-face-back-end.onrender.com/boards/${boardId}`, updatedData);//$ for template literals and string interpolation. Not sure.
 
-    } catch (error) {
-      console.log("Error updating board", error);
-    }
-  }
+  //   } catch (error) {We
+  //     console.log("Error updating board", error);
+  //   }
+  // }
   
-  async function updateCard(cardId, updatedData) {
-    try {
-      const response = await axios.put(`"https://in-your-face-back-end.onrender.com/cards/${cardId}`, updatedData);
+  // async function updateCard(cardId, updatedData) {
+  //   try {
+  //     const response = await axios.put(`"https://in-your-face-back-end.onrender.com/cards/${cardId}`, updatedData);
       
-    } catch (error) {
-      console.log("Error updating card", error);
-    }
-  }
+  //   } catch (error) {
+  //     console.log("Error updating card", error);
+  //   }
+  // }
   
-  async function deleteCard(cardId) {
-    try {
-      const response = await axios.delete(`"https://in-your-face-back-end.onrender.com/cards/${cardId}`);
+  // async function deleteCard(cardId) {
+  //   try {
+  //     const response = await axios.delete(`"https://in-your-face-back-end.onrender.com/cards/${cardId}`);
       
-    } catch (error) {
-      console.log("Error deleting card", error);
-    }
-  }
+  //   } catch (error) {
+  //     console.log("Error deleting card", error);
+  //   }
+  // }
   
   
 
