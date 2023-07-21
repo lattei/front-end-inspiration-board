@@ -24,7 +24,7 @@ function App() {
 
   async function fetchCards() {
     try {
-      const response = await axios.get("/cards");
+      const response = await axios.get("https://in-your-face-back-end.onrender.com/cards");
       setCards(response.data);
     } catch (error) {
       console.log("Error fetching cards", error);
@@ -33,7 +33,7 @@ function App() {
 
   async function fetchBoards() {
     try {
-      const response = await axios.get("/boards");
+      const response = await axios.get("https://in-your-face-back-end.onrender.com/boards");
       setBoards(response.data);
     } catch (error) {
       console.log("Error fetching boards", error);
